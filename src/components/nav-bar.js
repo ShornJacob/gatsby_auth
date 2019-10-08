@@ -1,6 +1,6 @@
 import React from "react"
-import { Link } from "gatsby"
-
+import { Link, navigate } from "gatsby"
+import { getUser, isLoggedIn, logout } from "../services/auth"
 //The flex container becomes flexible by setting the display property to flex:
 //https://css-tricks.com/snippets/css/a-guide-to-flexbox/
 //shorthand for flex-grow, flex-shrink and flex-basis combined.
@@ -15,22 +15,41 @@ import { Link } from "gatsby"
 //https://www.w3schools.com/cssref/pr_border-bottom.asp
 //Set the style of the bottom border for different elements:
 
-export default () => (
-  <div
-    style={{
-      display: "flex",
-      flex: "1",
-      justifyContent: "space-between",
-      borderBottom: "1px solid #d1c1e0",
-    }}
-  >
-    <span>You are not logged in</span>
-    <nav>
-      <Link to="/">Home</Link>
-      {` `}
-      <Link to="/">Profile</Link>
-      {` `}
-      <Link to="/">Logout</Link>
-    </nav>
-  </div>
-)
+export default () => {
+  const content = { message: "", login: true }
+  if (isLoggedIn()) {
+    content.message = `Hello, ${getUser().name}`
+  } else {
+    content.message = "You are not logged in"
+  }
+  return (
+    <div
+      style={{
+        display: "flex",
+        flex: "1",
+        justifyContent: "space-between",
+        borderBottom: "1px solid #d1c1e0",
+      }}
+    >
+      <span>{content.message}</span>
+      <nav>
+        <Link to="/">Home</Link>
+        {` `}
+        <Link to="/app/profile">Profile</Link>
+        {` `}
+        {isLoggedIn() ? (
+          <a
+            href="/"
+            onClick={event => {
+              event.preventDefault()
+              //navigate to login page after logging out, sent as callback
+              logout(() => navigate(`/app/login`))
+            }}
+          >
+            Logout
+          </a>
+        ) : null}
+      </nav>
+    </div>
+  )
+}

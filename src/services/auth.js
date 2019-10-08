@@ -38,6 +38,7 @@ export const isLoggedIn = () => {
   return !!user.username
 }
 
+//logout takes a call back on what to do after logging out
 export const logout = callback => {
   setUser({})
   callback()
